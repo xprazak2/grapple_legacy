@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: foreman-route
+  namespace: vanilla
+spec:
+  to:
+    kind: Service
+    name: foreman-vanilla
+  port:
+    targetPort: port-8080-tcp
