@@ -3,10 +3,10 @@
   vars:
     username: admin
     password: changeme
-    url: "http://{{ lookup('env', 'FOREMAN_SERVICE_HOST') }}:8080/api/v2/smart_proxies"
+    url: "http://foreman-route-vanilla.192.168.42.250.nip.io/api/v2/smart_proxies"
     data:
-      name: "{{ lookup('env', 'FOREMAN_PROXY_SERVICE_HOST') }}"
-      url: "http://{{ lookup('env', 'FOREMAN_PROXY_SERVICE_HOST') }}:8080"
+      name: "ansible-proxy"
+      url: "http://foreman-proxy:8080"
   tasks:
     - name: "register smart proxy"
       uri:

@@ -1,0 +1,28 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: foreman-proxy-register
+  namespace: vanilla
+  labels:
+    app: foreman-proxy-register
+spec:
+  template:
+    metadata:
+      labels:
+        app: foreman-proxy-register
+    spec:
+      restartPolicy: Never
+      serviceAccount: vanilla-anyuid
+      serviceAccountName: vanilla-anyuid
+      containers:
+        - name: register
+          image: foreman-proxy:2.0-2
+          command:
+            - ansible-playbook
+            - /root/register.yaml
+          env:
+            - name: FOREMAN_SERVICE_HOST
+              value: foreman-vanilla
+            - name: FOREMAN_PROXY_SERVICE_HOST
+              value: foreman-proxy

@@ -1,0 +1,4 @@
+---
+plugins:
+  foreman_openscap: tfm-rubygem-foreman_openscap
+  foreman_templates: tfm-rubygem-foreman_templates

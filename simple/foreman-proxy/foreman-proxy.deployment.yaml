@@ -1,0 +1,21 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foreman-proxy
+  namespace: vanilla
+  labels:
+    app: foreman-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foreman-proxy
+  template:
+    metadata:
+      labels:
+        app: foreman-proxy
+    spec:
+      containers:
+        - name: foreman-proxy
+          image: foreman-proxy:2.0-2
