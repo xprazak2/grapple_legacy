@@ -1,5 +1,0 @@
----
-- name: 'Build image'
-  command: "docker build {{ build_args | map('regex_replace', '(.*)', '--build-arg \\1') | join(' ') if build_args is not empty else '' }} -t {{ image }}:foo ."
-  args:
-    chdir: "../images/{{ image }}"

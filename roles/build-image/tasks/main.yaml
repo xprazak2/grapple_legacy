@@ -1,22 +1,12 @@
 ---
 - include_vars: known-images.yaml
 
-- debug:
-    msg: "Known images {{ known_images }}"
-
 - fail:
-    msg: "Unknown image to build: {{ image }}"
+    msg: "Unknown image to build: {{ image }}. Known images are: {{ known_images | join(', ') }}"
   when: image not in known_images
-
-
-# maybe I am trying to be too clever here
-- include_vars: "{{ image }}-rpms.yaml"
-# todo when exists
 
 - set_fact:
     build_dir: "{{ playbook_dir }}/../build"
-    install_rpms: "{{ plugins | map('extract', rpms) | list | join(' ') }}"
-# todo when vars file exists, if not, set install_rpms to empty string
 
 - name: 'Create build dir for {{ image }}'
   file:
@@ -28,7 +18,7 @@
     src: "{{ image }}/Dockerfile.j2"
     dest: "{{ build_dir }}/{{ image }}/Dockerfile"
 
-- name: "Copy container assets for {{ image }}"
+- name: "Copy container assets for {{ image }} to build dir"
   copy:
     src: "{{ role_path }}/files/{{ image }}/container-assets"
     dest: "{{ build_dir }}/{{ image }}"

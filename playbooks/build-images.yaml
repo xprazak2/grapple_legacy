@@ -1,0 +1,30 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    version: 2.0
+    foreman_version_build: 43
+    cleanup: false
+    foreman_plugin_rpms:
+      - tfm-rubygem-foreman_openscap
+    foreman_proxy_version_build: 37
+    foreman_proxy_plugin_rpms:
+      - tfm-rubygem-smart_proxy_openscap
+    foreman_proxy_plugin_configs:
+      - openscap.yml
+  roles:
+    - role: build-image
+      vars:
+        image: foreman
+        version_build: "{{ foreman_version_build }}"
+        rpms_to_install: "{{ foreman_plugins }}"
+      tags:
+      - foreman
+    - role: build-image
+      vars:
+        image: foreman-proxy
+        version_build: "{{ foreman_proxy_version_build }}"
+        rpms_to_install: "{{ foreman_proxy_plugin_rpms }}"
+        configs_to_copy: "{{ foreman_proxy_plugin_configs }}"
+      tags:
+      - foreman-proxy

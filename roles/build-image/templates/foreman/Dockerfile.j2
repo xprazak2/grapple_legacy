@@ -19,7 +19,7 @@ RUN yum -y remove foreman-sqlite tfm-ror51-rubygem-sqlite3 && \
     yum clean all
 # end generate apipie:cache:index
 
-RUN yum -y install tfm-rubygem-foreman_memcache {{ install_rpms }} && \
+RUN yum -y install tfm-rubygem-foreman_memcache {{ rpms_to_install | join(' ') }} && \
     yum clean all
 
 COPY container-assets/foreman_memcache.yaml /etc/foreman/plugins/foreman_memcache.yaml

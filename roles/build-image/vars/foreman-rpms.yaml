@@ -1,9 +1,0 @@
----
-rpms:
-  foreman_openscap: tfm-rubygem-foreman_openscap
-  foreman_templates: tfm-rubygem-foreman_templates
-  foreman_discovery: tfm-rubygem-foreman_discovery
-  foreman_ansible: tfm-rubygem-foreman_ansible
-  foreman_hooks: tfm-rubygem-foreman_hooks
-  foreman_remote_execution: tfm-rubygem-foreman_remote_execution
-  katello: tfm-rubygem-katello
