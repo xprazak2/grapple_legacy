@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foreman-vanilla
+  namespace: vanilla
+  labels:
+    app: foreman-vanilla
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foreman-vanilla
+  template:
+    metadata:
+      labels:
+        app: foreman-vanilla
+    spec:
+      serviceAccount: vanilla-anyuid
+      serviceAccountName: vanilla-anyuid
+      containers:
+        - name: foreman-vanilla
+          state: present
+          env:
+            - name: POSTGRES_DB
+              value: foreman
+            - name: POSTGRES_USER
+              value: foreman
+            - name: POSTGRES_PASSWORD
+              value: foreman
+            - name: SEED_ADMIN_USER
+              value: admin
+            - name: SEED_ADMIN_PASSWORD
+              value: changeme
+            - name: RAILS_ENV
+              value: production
+          ports:
+            - protocol: TCP
+              containerPort: 8080
+          image: "{{ foreman_image }}"
