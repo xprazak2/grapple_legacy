@@ -1,0 +1,5 @@
+---
+- version: v1alpha1
+  group: vanilla.example.com
+  kind: Foreman
+  role: /opt/ansible/roles/foreman

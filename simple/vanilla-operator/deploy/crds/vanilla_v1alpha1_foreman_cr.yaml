@@ -1,0 +1,7 @@
+apiVersion: vanilla.example.com/v1alpha1
+kind: Foreman
+metadata:
+  name: example-foreman
+spec:
+  # Add fields here
+  foreman_image: 'foreman-vanilla:2.0-15'

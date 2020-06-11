@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foreman-vanilla
+  namespace: vanilla
+  labels:
+    app: foreman-vanilla
+spec:
+  selector:
+    app: foreman-vanilla
+  ports:
+    - protocol: TCP
+      targetPort: 8080
+      name: port-8080-tcp
+      port: 8080
