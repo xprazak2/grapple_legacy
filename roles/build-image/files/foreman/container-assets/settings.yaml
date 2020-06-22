@@ -22,10 +22,17 @@
 :logging:
   :console_inline: true
   :level: debug
-:memcache:
-  :hosts:
-    - memcache
+# :memcache:
+#   :hosts:
+#     - memcache
+#   :options:
+#     :namespace: foreman
+#     :expires_in: 86400
+#     :compress: true
+:rails_cache_store:
+  :type: redis
+  :urls:
+   - redis://redis:8479/0
   :options:
-    :namespace: foreman
-    :expires_in: 86400
     :compress: true
+    :namespace: foreman

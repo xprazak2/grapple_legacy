@@ -37,4 +37,4 @@ spec:
           ports:
             - protocol: TCP
               containerPort: 8080
-          image: foreman-vanilla:2.0-14
+          image: foreman-vanilla:2.0-11

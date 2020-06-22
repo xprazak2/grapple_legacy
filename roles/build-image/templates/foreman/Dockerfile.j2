@@ -5,7 +5,7 @@ RUN echo "tsflags=nodocs" >> /etc/yum.conf && \
                    http://yum.theforeman.org/releases/{{ version }}/el7/x86_64/foreman-release.rpm && \
     yum -y install foreman-release-scl && \
     # yum -y install ansible && \
-    yum -y install foreman foreman-postgresql tfm-rubygem-puma && yum clean all
+    yum -y install foreman foreman-postgresql tfm-rubygem-puma tfm-rubygem-redis && yum clean all
 
 COPY container-assets/settings.yaml /etc/foreman/settings.yaml
 
@@ -19,10 +19,10 @@ RUN yum -y remove foreman-sqlite tfm-ror51-rubygem-sqlite3 && \
     yum clean all
 # end generate apipie:cache:index
 
-RUN yum -y install tfm-rubygem-foreman_memcache {{ rpms_to_install | join(' ') }} && \
-    yum clean all
+# RUN yum -y install tfm-rubygem-foreman_memcache {{ rpms_to_install | join(' ') }} && \
+#     yum clean all
 
-COPY container-assets/foreman_memcache.yaml /etc/foreman/plugins/foreman_memcache.yaml
+# COPY container-assets/foreman_memcache.yaml /etc/foreman/plugins/foreman_memcache.yaml
 COPY container-assets/database.yml /etc/foreman/database.yml
 COPY container-assets/entrypoint.sh /usr/bin/entrypoint.sh
 COPY container-assets/start_foreman.sh /usr/bin/start_foreman.sh

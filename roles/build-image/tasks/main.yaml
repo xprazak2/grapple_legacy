@@ -6,7 +6,7 @@
   when: image not in known_images
 
 - set_fact:
-    build_dir: "{{ playbook_dir }}/../build"
+    build_dir: "{{ playbook_dir }}/../tmp"
 
 - name: 'Create build dir for {{ image }}'
   file:

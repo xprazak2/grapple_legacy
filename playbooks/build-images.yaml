@@ -3,7 +3,7 @@
   gather_facts: no
   vars:
     version: 2.0
-    foreman_version_build: 43
+    foreman_version_build: 11
     cleanup: false
     foreman_plugin_rpms:
       - tfm-rubygem-foreman_openscap
@@ -17,7 +17,7 @@
       vars:
         image: foreman
         version_build: "{{ foreman_version_build }}"
-        rpms_to_install: "{{ foreman_plugins }}"
+        rpms_to_install: "{{ foreman_plugin_rpms }}"
       tags:
       - foreman
     - role: build-image
