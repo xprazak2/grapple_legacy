@@ -3,15 +3,12 @@
   gather_facts: no
   vars:
     version: 2.0
-    foreman_version_build: 11
+    foreman_version_build: 1
     cleanup: false
-    foreman_plugin_rpms:
-      - tfm-rubygem-foreman_openscap
-    foreman_proxy_version_build: 37
-    foreman_proxy_plugin_rpms:
-      - tfm-rubygem-smart_proxy_openscap
-    foreman_proxy_plugin_configs:
-      - openscap.yml
+    foreman_plugin_rpms: []
+    foreman_proxy_version_build: 1
+    foreman_proxy_plugin_rpms: []
+    foreman_proxy_plugin_configs: []
   roles:
     - role: build-image
       vars:

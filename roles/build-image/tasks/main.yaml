@@ -22,6 +22,7 @@
   copy:
     src: "{{ role_path }}/files/{{ image }}/container-assets"
     dest: "{{ build_dir }}/{{ image }}"
+    mode: preserve
   # todo when container-assets exist
 
 - name: "Build image for {{ image }}"
