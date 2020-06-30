@@ -4,4 +4,4 @@ metadata:
   name: example-foreman
 spec:
   # Add fields here
-  foreman_image: 'foreman-vanilla:2.0-15'
+  foreman_image: 'foreman:2.0-15'

@@ -16,8 +16,8 @@ spec:
       labels:
         app: foreman-vanilla
     spec:
-      serviceAccount: vanilla-anyuid
-      serviceAccountName: vanilla-anyuid
+      serviceAccount: vanilla-operator
+      serviceAccountName: vanilla-operator
       containers:
         - name: foreman-vanilla
           state: present
