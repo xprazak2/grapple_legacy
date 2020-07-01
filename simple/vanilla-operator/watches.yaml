@@ -2,4 +2,5 @@
 - version: v1alpha1
   group: vanilla.example.com
   kind: Foreman
-  role: /opt/ansible/roles/foreman
+  # role: /opt/ansible/roles/foreman
+  playbook: /opt/ansible/foreman_playbook.yaml

@@ -1,0 +1,5 @@
+---
+- debug:
+  msg: 'I am smart proxy role'
+
+- debug: var=extra_vars

@@ -7,3 +7,4 @@
   k8s:
     definition: "{{ lookup('template', 'templates/foreman-vanilla.deployment.yaml') | from_yaml }}"
 
+- debug: var=vars
