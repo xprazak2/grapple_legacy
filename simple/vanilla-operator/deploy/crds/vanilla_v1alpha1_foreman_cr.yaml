@@ -6,5 +6,5 @@ spec:
   # Add fields here
   foreman_image: 'foreman:2.0-15'
   smart_proxies:
-    - name: 'first proxy'
+    - name: 'second proxy'
       image: 'foreman-proxy:2.0-1'

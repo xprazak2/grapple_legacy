@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    registered_proxies:
+      - name: 'first'
+        id: 1
+        url: "https:"
+      - name: second
+        id: 2
+        url: http
+    smart_proxies:
+      - name: second
+        image: second-image
+      - name: third
+        image: third-image
+  tasks:
+    - set_fact:
+        to_register: "{{ smart_proxies | map(attribute = 'name') | difference(registered_proxies | map(attribute = 'name')) | list }}"
+        to_remove: "{{ registered_proxies| map(attribute = 'name') | difference(smart_proxies | map(attribute = 'name')) | list }}"
+
+    - debug:
+        msg: "{{ to_register }}"
+
+    - debug:
+        msg: "{{ to_remove }}"
+
+    - set_fact:
+        to_remove_objs: "{{ registered_proxies | selectattr('name', 'in', to_remove) | sort }}"
+
+    - debug:
+        msg: "{{ to_remove_objs }}"

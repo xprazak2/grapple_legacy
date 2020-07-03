@@ -1,5 +1,70 @@
 ---
 - debug:
-  msg: 'I am smart proxy role'
+    msg: "I am smart proxy role with proxy name: {{ item.name }}, {{ item.image }}"
+  with_items: "{{ smart_proxies }}"
 
-- debug: var=extra_vars
+- name: "Get list of registered proxies"
+  uri:
+    force_basic_auth: yes
+    headers:
+      Content-Type: "application/json"
+    method: GET
+    return_content: yes
+    timeout: 3
+    user: admin
+    password: changeme
+    url: "http://foreman-vanilla:8080/api/v2/smart_proxies"
+    status_code: [200]
+  register: registered_proxies
+  until: (registered_proxies.json is defined and registered_proxies.status == 200)
+  retries: 5
+  delay: 4
+
+- debug:
+    msg: "{{ registered_proxies.json.results }}"
+
+- set_fact:
+    to_register: "{{ smart_proxies | map(attribute = 'name') | difference(registered_proxies | map(attribute = 'name')) | list }}"
+    to_remove: "{{ registered_proxies| map(attribute = 'name') | difference(smart_proxies | map(attribute = 'name')) | list }}"
+
+- set_fact:
+    to_remove_objs: "{{ registered_proxies | selectattr('name', 'in', to_remove) | sort }}"
+
+- name: "Register new proxies"
+    uri:
+      force_basic_auth: yes
+      headers:
+        Content-Type: "application/json"
+      method: POST
+      return_content: yes
+      timeout: 3
+      user: admin
+      password: changeme
+      url: "http://foreman-vanilla:8080/api/v2/smart_proxies"
+      body:
+        name: "{{ item }}"
+        url: "http://{{ item }}:8080"
+      status_code: [201]
+    register: registration_result
+    until: (registration_result.json is defined) and (registration_result.status == 422 or registration_result.status == 201)
+    retries: 300
+    delay: 4
+  with_items: "{{ to_register }}"
+
+- name: "Remove old proxies"
+    uri:
+      force_basic_auth: yes
+      headers:
+        Content-Type: "application/json"
+      method: DELETE
+      return_content: yes
+      timeout: 3
+      user: admin
+      password: changeme
+      url: "http://foreman-vanilla:8080/api/v2/smart_proxies/{{ item.id }}"
+      status_code: [200]
+    register: registration_result
+    until: (registration_result.json is defined) and (registration_result.status == 200)
+    retries: 300
+    delay: 4
+  with_items: "{{ to_remove_objs }}"
