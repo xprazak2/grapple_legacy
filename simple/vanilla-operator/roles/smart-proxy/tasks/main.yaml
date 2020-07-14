@@ -1,8 +1,4 @@
 ---
-- debug:
-    msg: "I am smart proxy role with proxy name: {{ item.name }}, {{ item.image }}"
-  with_items: "{{ smart_proxies }}"
-
 - name: "Get list of registered proxies"
   uri:
     force_basic_auth: yes
@@ -20,51 +16,88 @@
   retries: 5
   delay: 4
 
+- set_fact:
+    to_register: "{{ smart_proxies | map(attribute = 'name') | difference(registered_proxies.json.results | map(attribute = 'name')) | list }}"
+
+- set_fact:
+    to_remove: "{{ registered_proxies.json.results | map(attribute = 'name') | difference(smart_proxies | map(attribute = 'name')) | list }}"
+
+- set_fact:
+    to_register_objs: "{{ smart_proxies | selectattr('name', 'in', to_register) | sort }}"
+
 - debug:
-    msg: "{{ registered_proxies.json.results }}"
+    msg: "{{ to_register }}"
 
-- set_fact:
-    to_register: "{{ smart_proxies | map(attribute = 'name') | difference(registered_proxies | map(attribute = 'name')) | list }}"
-    to_remove: "{{ registered_proxies| map(attribute = 'name') | difference(smart_proxies | map(attribute = 'name')) | list }}"
+- debug:
+    msg: "{{ to_remove }}"
 
-- set_fact:
-    to_remove_objs: "{{ registered_proxies | selectattr('name', 'in', to_remove) | sort }}"
+- debug:
+    msg: "{{ to_register_objs }}"
+
+- name: Add new Smart Proxy service
+  k8s:
+    definition: "{{ lookup('template', 'templates/smart-proxy.service.yaml') | from_yaml }}"
+  with_items: "{{ to_register_objs }}"
+
+- name: Add new Smart Proxy deployment
+  k8s:
+    definition: "{{ lookup('template', 'templates/smart-proxy.deployment.yaml') | from_yaml }}"
+  with_items: "{{ to_register_objs }}"
 
 - name: "Register new proxies"
-    uri:
-      force_basic_auth: yes
-      headers:
-        Content-Type: "application/json"
-      method: POST
-      return_content: yes
-      timeout: 3
-      user: admin
-      password: changeme
-      url: "http://foreman-vanilla:8080/api/v2/smart_proxies"
-      body:
-        name: "{{ item }}"
-        url: "http://{{ item }}:8080"
-      status_code: [201]
-    register: registration_result
-    until: (registration_result.json is defined) and (registration_result.status == 422 or registration_result.status == 201)
-    retries: 300
-    delay: 4
+  uri:
+    force_basic_auth: yes
+    headers:
+      Content-Type: "application/json"
+    method: POST
+    return_content: yes
+    timeout: 3
+    user: admin
+    password: changeme
+    url: "http://foreman-vanilla:8080/api/v2/smart_proxies"
+    body_format: json
+    body:
+      name: "{{ item }}"
+      url: "http://{{ item }}:8080"
+    status_code: [201]
+  register: registration_result
+  until: (registration_result.json is defined) and (registration_result.status == 422 or registration_result.status == 201)
+  retries: 3
+  delay: 4
   with_items: "{{ to_register }}"
 
 - name: "Remove old proxies"
-    uri:
-      force_basic_auth: yes
-      headers:
-        Content-Type: "application/json"
-      method: DELETE
-      return_content: yes
-      timeout: 3
-      user: admin
-      password: changeme
-      url: "http://foreman-vanilla:8080/api/v2/smart_proxies/{{ item.id }}"
-      status_code: [200]
-    register: registration_result
-    until: (registration_result.json is defined) and (registration_result.status == 200)
-    retries: 300
-    delay: 4
+  uri:
+    force_basic_auth: yes
+    headers:
+      Content-Type: "application/json"
+    method: DELETE
+    return_content: yes
+    timeout: 3
+    user: admin
+    password: changeme
+    url: "http://foreman-vanilla:8080/api/v2/smart_proxies/{{ item.id }}"
+    status_code: [200]
+  register: registration_result
+  until: (registration_result.json is defined) and (registration_result.status == 200)
+  retries: 3
+  delay: 4
   with_items: "{{ to_remove_objs }}"
+
+- name: Remove old Smart Proxy service
+  k8s:
+    state: absent
+    api_version: v1
+    kind: Service
+    namespace: vanilla
+    name: "{{ item }}"
+  with_items: "{{ to_remove }}"
+
+- name: Remove old Smart Proxy deployment
+  k8s:
+    state: absent
+    api_version: apps/v1
+    kind: Deployment
+    namespace: vanilla
+    name: "{{ item }}"
+  with_items: "{{ to_remove }}"

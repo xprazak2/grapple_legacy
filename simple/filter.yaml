@@ -26,7 +26,7 @@
         msg: "{{ to_remove }}"
 
     - set_fact:
-        to_remove_objs: "{{ registered_proxies | selectattr('name', 'in', to_remove) | sort }}"
+        to_remove_objs: "{{ registered_proxies | selectattr('name', 'in', to_remove) | map('combine', {'image': ''}) | sort }}"
 
     - debug:
         msg: "{{ to_remove_objs }}"
