@@ -4,7 +4,8 @@ metadata:
   name: example-foreman
 spec:
   # Add fields here
-  foreman_image: 'foreman:2.0-scap'
+  foreman_image: 'foreman:2.0-15'
   smart_proxies:
-    - name: 'sp-for-the-win'
-      image: 'foreman-proxy:2.0-scap'
+    - name: 'default-proxy'
+      image: 'foreman-proxy:2.0-1'
+

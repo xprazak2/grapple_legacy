@@ -16,6 +16,7 @@
   retries: 5
   delay: 4
 
+# TODO: use custom filters for this
 - set_fact:
     to_register: "{{ smart_proxies | map(attribute = 'name') | difference(registered_proxies.json.results | map(attribute = 'name')) | list }}"
 
@@ -29,7 +30,13 @@
     to_register_objs: "{{ smart_proxies | selectattr('name', 'in', to_register) | sort }}"
 
 - set_fact:
+    to_remove_objs: "{{ registered_proxies.json.results | selectattr('name', 'in', to_remove) | sort }}"
+
+- set_fact:
     to_update_objs: "{{ smart_proxies | selectattr('name', 'in', to_update) | sort }}"
+
+- set_fact:
+    to_refresh_objs: "{{ registered_proxies.json.results | selectattr('name', 'in', to_update) | sort }}"
 
 - debug:
     msg: "{{ to_register }}"
@@ -48,30 +55,6 @@
     state: present
     definition: "{{ lookup('template', 'templates/smart-proxy.deployment.yaml') | from_yaml }}"
   with_items: "{{ to_update_objs }}"
-
-  #   state: present
-  #   definition:
-  #     apiVersion: apps/v1
-  #     kind: Deployment
-  #     metadata:
-  #       name: "{{ item.name }}"
-  #       namespace: vanilla
-  #       labels:
-  #         app: "{{ item.name }}"
-  #     spec:
-  #       replicas: 1
-  #       selector:
-  #         matchLabels:
-  #           app: "{{ item.name }}"
-  #       template:
-  #         metadata:
-  #           labels:
-  #             app: "{{ item.name }}"
-  #         spec:
-  #           containers:
-  #             - name: foreman-proxy
-  #               image: "{{ item.image }}"
-  # with_items: "{{ to_update_objs }}"
 
 - name: Add new Smart Proxy service
   k8s:
@@ -140,3 +123,25 @@
     namespace: vanilla
     name: "{{ item }}"
   with_items: "{{ to_remove }}"
+
+- name: Refresh existing proxies
+  uri:
+    force_basic_auth: yes
+    headers:
+      Content-Type: "application/json"
+    method: PUT
+    return_content: yes
+    timeout: 3
+    user: admin
+    password: changeme
+    url: "http://foreman-vanilla:8080/api/v2/smart_proxies/{{ item.id }}/refresh"
+    body_format: json
+    body:
+      name: "{{ item }}"
+    status_code: [200]
+  register: refresh_result
+  until: (refresh_result.json is defined) and (refresh_result.status == 422 or refresh_result.status == 200)
+  retries: 3
+  delay: 4
+  with_items: "{{ to_refresh_objs }}"
+
