@@ -23,7 +23,13 @@
     to_remove: "{{ registered_proxies.json.results | map(attribute = 'name') | difference(smart_proxies | map(attribute = 'name')) | list }}"
 
 - set_fact:
+    to_update: "{{ registered_proxies.json.results | map(attribute = 'name') | intersect(smart_proxies | map(attribute = 'name')) | list }}"
+
+- set_fact:
     to_register_objs: "{{ smart_proxies | selectattr('name', 'in', to_register) | sort }}"
+
+- set_fact:
+    to_update_objs: "{{ smart_proxies | selectattr('name', 'in', to_update) | sort }}"
 
 - debug:
     msg: "{{ to_register }}"
@@ -33,6 +39,39 @@
 
 - debug:
     msg: "{{ to_register_objs }}"
+
+- debug:
+    msg: "{{ to_update_objs }}"
+
+- name: Update existing Proxy deployment
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'templates/smart-proxy.deployment.yaml') | from_yaml }}"
+  with_items: "{{ to_update_objs }}"
+
+  #   state: present
+  #   definition:
+  #     apiVersion: apps/v1
+  #     kind: Deployment
+  #     metadata:
+  #       name: "{{ item.name }}"
+  #       namespace: vanilla
+  #       labels:
+  #         app: "{{ item.name }}"
+  #     spec:
+  #       replicas: 1
+  #       selector:
+  #         matchLabels:
+  #           app: "{{ item.name }}"
+  #       template:
+  #         metadata:
+  #           labels:
+  #             app: "{{ item.name }}"
+  #         spec:
+  #           containers:
+  #             - name: foreman-proxy
+  #               image: "{{ item.image }}"
+  # with_items: "{{ to_update_objs }}"
 
 - name: Add new Smart Proxy service
   k8s:
