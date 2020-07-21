@@ -17,6 +17,7 @@
   delay: 4
 
 # TODO: use custom filters for this
+
 - set_fact:
     to_register: "{{ smart_proxies | map(attribute = 'name') | difference(registered_proxies.json.results | map(attribute = 'name')) | list }}"
 
@@ -33,10 +34,13 @@
     to_remove_objs: "{{ registered_proxies.json.results | selectattr('name', 'in', to_remove) | sort }}"
 
 - set_fact:
-    to_update_objs: "{{ smart_proxies | selectattr('name', 'in', to_update) | sort }}"
+    to_update_objs: "{{ smart_proxies | selectattr('name', 'in', to_update) | list }}"
 
 - set_fact:
-    to_refresh_objs: "{{ registered_proxies.json.results | selectattr('name', 'in', to_update) | sort }}"
+    to_refresh_objs: "{{ registered_proxies.json.results | selectattr('name', 'in', to_update) | list }}"
+
+- debug:
+    msg: "{{ smart_proxies }}"
 
 - debug:
     msg: "{{ to_register }}"

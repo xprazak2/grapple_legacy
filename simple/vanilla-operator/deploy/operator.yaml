@@ -20,7 +20,7 @@ spec:
           - /tmp/ansible-operator/runner
           - stdout
           # Replace this with the built image name
-          image: vanilla-operator:0.0.43
+          image: vanilla-operator:0.0.46
           # imagePullPolicy: "{{ pull_policy|default('Always') }}"
           volumeMounts:
           - mountPath: /tmp/ansible-operator/runner
@@ -28,7 +28,7 @@ spec:
             readOnly: true
         - name: operator
           # Replace this with the built image name
-          image: vanilla-operator:0.0.43
+          image: vanilla-operator:0.0.46
           # imagePullPolicy: "{{ pull_policy|default('Always') }}"
           volumeMounts:
           - mountPath: /tmp/ansible-operator/runner
